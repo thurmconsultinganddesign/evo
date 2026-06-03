@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { ProfileEditor } from './ProfileEditor';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage({
   searchParams,
 }: {

@@ -2,6 +2,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import type { RegenPartner } from '@/types';
 import { PartnersDirectory } from './PartnersDirectory';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PartnersPage() {
   const supabase = await createServerSupabaseClient();
 

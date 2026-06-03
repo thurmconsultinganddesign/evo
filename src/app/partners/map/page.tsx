@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { PartnerMap } from './PartnerMap';
 import type { RegenPartner } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MapPage() {
   const supabase = await createServerSupabaseClient();
 

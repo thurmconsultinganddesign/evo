@@ -5,6 +5,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { cn } from '@/lib/utils';
 import type { Profile } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PublicProfilePage({
   params,
 }: {
