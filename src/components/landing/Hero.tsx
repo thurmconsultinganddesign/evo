@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center section-dark section-padding pt-32">
@@ -19,17 +17,10 @@ export function Hero() {
         <p className="text-lg md:text-xl text-cream/60 max-w-2xl mx-auto mb-4 leading-relaxed">
           Evolove is the synthesis of conscious development and deep care.
         </p>
-        <p className="text-base md:text-lg text-cream/40 max-w-xl mx-auto mb-12">
+        <p className="text-base md:text-lg text-cream/40 max-w-xl mx-auto">
           Building the infrastructure for a regenerative civilization.
           Starting here, in Ubud.
         </p>
-
-        <Link
-          href="/login"
-          className="inline-block px-8 py-3.5 border border-cream/20 text-cream text-sm uppercase tracking-[0.15em] hover:bg-cream/5 transition-all duration-300"
-        >
-          Join the Evo Living
-        </Link>
       </div>
 
       {/* Scroll indicator */}

@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 export function JoinCTA() {
   return (
     <section className="section-dark section-padding">
@@ -20,18 +18,11 @@ export function JoinCTA() {
           — Buckminster Fuller
         </p>
 
-        <p className="text-cream/50 max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-cream/50 max-w-2xl mx-auto leading-relaxed">
           An invitation to farmers, entrepreneurs, educators, technologists,
           policymakers, and communities rediscovering their relationship with
           the living Earth. We are building together, starting in Ubud.
         </p>
-
-        <Link
-          href="/login"
-          className="inline-block px-10 py-4 border border-cream/20 text-cream text-sm uppercase tracking-[0.15em] hover:bg-cream/5 transition-all duration-300"
-        >
-          Join Evolove
-        </Link>
       </div>
     </section>
   );
