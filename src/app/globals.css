@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-dark text-cream font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-gold/30 text-cream;
+  }
+}
+
+@layer components {
+  .section-dark {
+    @apply bg-dark text-cream;
+  }
+
+  .section-cream {
+    @apply bg-cream text-dark;
+  }
+
+  .section-padding {
+    @apply px-6 py-20 md:py-28 lg:py-32;
+  }
+
+  .section-container {
+    @apply mx-auto max-w-content;
+  }
+
+  .label-sm {
+    @apply text-xs uppercase tracking-[0.2em] text-gold font-sans font-medium;
+  }
+}
