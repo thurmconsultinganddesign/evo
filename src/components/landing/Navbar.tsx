@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 const NAV_LINKS = [
   { label: 'Fundamentals', href: '#fundamentals' },
@@ -14,11 +15,25 @@ const NAV_LINKS = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        setIsLoggedIn(!!user);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
   }, []);
 
   return (
@@ -48,10 +63,10 @@ export function Navbar() {
             </a>
           ))}
           <Link
-            href="/login"
+            href={isLoggedIn ? '/dashboard' : '/login'}
             className="text-sm px-5 py-2 border border-gold/40 text-gold hover:bg-gold/10 rounded transition-all duration-200"
           >
-            Sign In
+            {isLoggedIn ? 'Dashboard' : 'Sign In'}
           </Link>
         </div>
 
@@ -86,10 +101,10 @@ export function Navbar() {
               </a>
             ))}
             <Link
-              href="/login"
+              href={isLoggedIn ? '/dashboard' : '/login'}
               className="text-sm px-5 py-2 border border-gold/40 text-gold hover:bg-gold/10 rounded text-center mt-2"
             >
-              Sign In
+              {isLoggedIn ? 'Dashboard' : 'Sign In'}
             </Link>
           </div>
         </div>

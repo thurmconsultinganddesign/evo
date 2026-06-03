@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>(
+  const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error' | 'not_allowed'>(
     'idle',
   );
   const [errorMessage, setErrorMessage] = useState('');
@@ -18,8 +18,20 @@ export default function LoginPage() {
 
     const supabase = createBrowserSupabaseClient();
 
+    // Check if email is on the allow-list
+    const { data: allowed } = await supabase
+      .from('allowed_emails')
+      .select('email')
+      .eq('email', email.toLowerCase().trim())
+      .single();
+
+    if (!allowed) {
+      setStatus('not_allowed');
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: email.toLowerCase().trim(),
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -52,6 +64,23 @@ export default function LoginPage() {
               link to sign in.
             </p>
           </div>
+        ) : status === 'not_allowed' ? (
+          <div className="rounded-lg border border-terracotta/30 bg-terracotta/10 p-6 text-center">
+            <p className="text-lg text-cream">Invite Only</p>
+            <p className="mt-2 text-sm text-sage">
+              This platform is currently invite-only. If you believe you should
+              have access, please contact the team.
+            </p>
+            <button
+              onClick={() => {
+                setStatus('idle');
+                setEmail('');
+              }}
+              className="mt-4 text-sm text-gold hover:text-gold-light transition-colors"
+            >
+              Try a different email
+            </button>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -81,7 +110,7 @@ export default function LoginPage() {
               disabled={status === 'loading'}
               className="w-full rounded-lg bg-gold px-6 py-3 font-medium text-dark transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {status === 'loading' ? 'Sending...' : 'Send Magic Link'}
+              {status === 'loading' ? 'Checking...' : 'Send Magic Link'}
             </button>
           </form>
         )}
