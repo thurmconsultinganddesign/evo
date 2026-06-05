@@ -118,21 +118,16 @@ export function LocationPicker({ latitude, longitude, onChange }: LocationPicker
     searchTimeoutRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const params = new URLSearchParams({
-          q: query,
-          format: 'json',
-          limit: '5',
-          viewbox: '115.15,-8.40,115.40,-8.60',
-          bounded: '0',
-        });
+        const encoded = encodeURIComponent(query);
+        const url = `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=5&countrycodes=id`;
 
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
-          headers: { 'Accept-Language': 'en' },
-        });
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Search failed');
         const data: SearchResult[] = await res.json();
         setSearchResults(data);
-        setShowResults(true);
-      } catch {
+        setShowResults(data.length > 0);
+      } catch (err) {
+        console.error('Location search error:', err);
         setSearchResults([]);
       } finally {
         setSearching(false);
