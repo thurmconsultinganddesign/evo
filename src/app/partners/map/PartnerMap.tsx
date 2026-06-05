@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import type { RegenPartner } from '@/types';
 
 // Ubud center coordinates
@@ -11,7 +10,6 @@ const DEFAULT_ZOOM = 13;
 export function PartnerMap({ partners }: { partners: RegenPartner[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const [selectedPartner, setSelectedPartner] = useState<RegenPartner | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -64,11 +62,17 @@ export function PartnerMap({ partners }: { partners: RegenPartner[] }) {
             icon: goldIcon,
           }).addTo(map);
 
-          marker.on('click', () => {
-            setSelectedPartner(partner);
-          });
+          // Popup with partner info and link
+          marker.bindPopup(`
+            <div style="font-family: Inter, system-ui, sans-serif; min-width: 180px;">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #D4A843; margin-bottom: 4px;">${partner.category || ''}</div>
+              <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">${partner.business_name}</div>
+              ${partner.short_description ? `<div style="font-size: 12px; color: #666; margin-bottom: 8px;">${partner.short_description}</div>` : ''}
+              <a href="/partners/${partner.id}" style="font-size: 12px; color: #D4A843; text-decoration: none;">View Details &rarr;</a>
+            </div>
+          `, { className: 'partner-popup' });
 
-          // Simple tooltip on hover
+          // Tooltip on hover
           marker.bindTooltip(partner.business_name, {
             direction: 'top',
             offset: [0, -30],
@@ -111,6 +115,23 @@ export function PartnerMap({ partners }: { partners: RegenPartner[] }) {
         .partner-tooltip::before {
           border-top-color: #1a1a1a !important;
         }
+        .partner-popup .leaflet-popup-content-wrapper {
+          background: #1a1a1a;
+          color: #FAF7F2;
+          border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .partner-popup .leaflet-popup-tip {
+          background: #1a1a1a;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        .partner-popup .leaflet-popup-close-button {
+          color: rgba(255,255,255,0.4) !important;
+        }
+        .partner-popup .leaflet-popup-close-button:hover {
+          color: #FAF7F2 !important;
+        }
         .leaflet-control-zoom a {
           background: #1a1a1a !important;
           color: #FAF7F2 !important;
@@ -133,41 +154,6 @@ export function PartnerMap({ partners }: { partners: RegenPartner[] }) {
         {!mapReady && (
           <div className="absolute inset-0 flex items-center justify-center bg-dark-50 rounded-sm">
             <p className="text-cream/40 text-sm">Loading map...</p>
-          </div>
-        )}
-
-        {/* Selected partner panel */}
-        {selectedPartner && (
-          <div className="absolute top-4 right-4 w-80 bg-dark/95 backdrop-blur-md border border-white/10 rounded-sm p-5 shadow-xl">
-            <button
-              onClick={() => setSelectedPartner(null)}
-              className="absolute top-3 right-3 text-cream/40 hover:text-cream"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <span className="inline-block text-xs px-2 py-0.5 bg-gold/10 text-gold border border-gold/20 rounded-sm mb-3">
-              {selectedPartner.category}
-            </span>
-
-            <h3 className="font-serif text-lg text-cream mb-2">
-              {selectedPartner.business_name}
-            </h3>
-
-            {selectedPartner.short_description && (
-              <p className="text-cream/50 text-sm mb-4 leading-relaxed">
-                {selectedPartner.short_description}
-              </p>
-            )}
-
-            <Link
-              href={`/partners/${selectedPartner.id}`}
-              className="inline-block text-sm text-gold hover:text-gold-light transition-colors"
-            >
-              View Details &rarr;
-            </Link>
           </div>
         )}
 
