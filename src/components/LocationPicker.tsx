@@ -122,7 +122,7 @@ export function LocationPicker({ latitude, longitude, onChange }: LocationPicker
           q: query,
           format: 'json',
           limit: '5',
-          viewbox: '115.15,−8.40,115.40,−8.60',
+          viewbox: '115.15,-8.40,115.40,-8.60',
           bounded: '0',
         });
 
