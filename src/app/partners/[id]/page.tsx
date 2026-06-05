@@ -24,6 +24,10 @@ export default async function PartnerDetailPage({
     notFound();
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const p = partner as RegenPartner;
 
   return (
@@ -56,14 +60,22 @@ export default async function PartnerDetailPage({
 
       <main className="px-6 py-12">
         <div className="mx-auto max-w-3xl">
-          {/* Back link */}
-          <div className="mb-8">
+          {/* Back link + Edit */}
+          <div className="mb-8 flex items-center justify-between">
             <Link
               href="/partners"
               className="text-sm text-cream/40 hover:text-cream/60 transition-colors"
             >
               &larr; Back to Partners
             </Link>
+            {user && (
+              <Link
+                href={`/partners/${p.id}/edit`}
+                className="text-sm text-gold hover:text-gold-light transition-colors"
+              >
+                Edit Listing
+              </Link>
+            )}
           </div>
 
           {/* Photo gallery */}

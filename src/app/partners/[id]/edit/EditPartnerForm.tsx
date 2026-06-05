@@ -7,11 +7,11 @@ import { useRouter } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { PARTNER_CATEGORIES } from '@/types';
-import type { PartnerCategory } from '@/types';
+import type { PartnerCategory, RegenPartner } from '@/types';
 import { LocationPicker } from '@/components/LocationPicker';
 
-interface NewPartnerFormProps {
-  userId: string;
+interface EditPartnerFormProps {
+  partner: RegenPartner;
 }
 
 /**
@@ -23,19 +23,16 @@ interface NewPartnerFormProps {
  *   ll=-8.5069,115.2624
  */
 function extractLatLng(url: string): { lat: number; lng: number } | null {
-  // Pattern: @lat,lng
   const atMatch = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
   if (atMatch) {
     return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
   }
 
-  // Pattern: !3dlat!4dlng
   const bangMatch = url.match(/!3d(-?\d+\.?\d*)!4d(-?\d+\.?\d*)/);
   if (bangMatch) {
     return { lat: parseFloat(bangMatch[1]), lng: parseFloat(bangMatch[2]) };
   }
 
-  // Pattern: q=lat,lng or ll=lat,lng
   const qMatch = url.match(/[?&](?:q|ll)=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
   if (qMatch) {
     return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
@@ -44,23 +41,39 @@ function extractLatLng(url: string): { lat: number; lng: number } | null {
   return null;
 }
 
-export function NewPartnerForm({ userId }: NewPartnerFormProps) {
+export function EditPartnerForm({ partner }: EditPartnerFormProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form state
-  const [businessName, setBusinessName] = useState('');
-  const [shortDescription, setShortDescription] = useState('');
-  const [category, setCategory] = useState<PartnerCategory>('Service');
-  const [sustainabilityStatement, setSustainabilityStatement] = useState('');
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [offeringsUrl, setOfferingsUrl] = useState('');
-  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [contactDetails, setContactDetails] = useState('');
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  // Form state — pre-populated from existing partner
+  const [businessName, setBusinessName] = useState(partner.business_name);
+  const [shortDescription, setShortDescription] = useState(
+    partner.short_description ?? '',
+  );
+  const [category, setCategory] = useState<PartnerCategory>(partner.category);
+  const [sustainabilityStatement, setSustainabilityStatement] = useState(
+    partner.sustainability_statement ?? '',
+  );
+  const [websiteUrl, setWebsiteUrl] = useState(partner.website_url ?? '');
+  const [offeringsUrl, setOfferingsUrl] = useState(
+    partner.offerings_url ?? '',
+  );
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(
+    partner.google_maps_url ?? '',
+  );
+  const [latitude, setLatitude] = useState<number | null>(
+    partner.latitude ?? null,
+  );
+  const [longitude, setLongitude] = useState<number | null>(
+    partner.longitude ?? null,
+  );
+  const [contactDetails, setContactDetails] = useState(
+    partner.contact_details ?? '',
+  );
+  const [photoUrls, setPhotoUrls] = useState<string[]>(partner.photos ?? []);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>(
+    partner.photos ?? [],
+  );
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -92,7 +105,6 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
 
     const fileArray = Array.from(files);
 
-    // Validate
     for (const file of fileArray) {
       if (!file.type.startsWith('image/')) {
         setFeedback({
@@ -118,7 +130,6 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
       return;
     }
 
-    // Show previews immediately
     const previews = fileArray.map((f) => URL.createObjectURL(f));
     setPhotoPreviews((prev) => [...prev, ...previews]);
 
@@ -131,7 +142,7 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
 
       for (const file of fileArray) {
         const fileExt = file.name.split('.').pop();
-        const filePath = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const filePath = `${partner.created_by}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from('partner-photos')
@@ -153,13 +164,11 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
         message:
           err instanceof Error ? err.message : 'Failed to upload photos.',
       });
-      // Remove previews that failed
       setPhotoPreviews((prev) =>
         prev.slice(0, prev.length - previews.length),
       );
     } finally {
       setUploading(false);
-      // Reset file input so the same files can be selected again
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -186,7 +195,6 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
       const supabase = createBrowserSupabaseClient();
 
       const partnerData = {
-        created_by: userId,
         business_name: businessName.trim(),
         short_description: shortDescription.trim() || null,
         category,
@@ -202,32 +210,30 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
 
       const { error } = await supabase
         .from('regen_partners')
-        .insert(partnerData);
+        .update(partnerData)
+        .eq('id', partner.id);
 
       if (error) throw error;
 
       setFeedback({
         type: 'success',
-        message: 'Partner added! Redirecting...',
+        message: 'Changes saved! Redirecting...',
       });
 
-      setTimeout(() => router.push('/partners'), 1500);
+      setTimeout(() => router.push(`/partners/${partner.id}`), 1500);
     } catch (err) {
       setFeedback({
         type: 'error',
         message:
-          err instanceof Error ? err.message : 'Failed to save partner.',
+          err instanceof Error ? err.message : 'Failed to save changes.',
       });
     } finally {
       setSaving(false);
     }
   }
 
-  // Use previews when available, fall back to uploaded URLs
   const displayPhotos =
-    photoPreviews.length > 0
-      ? photoPreviews
-      : photoUrls;
+    photoPreviews.length > 0 ? photoPreviews : photoUrls;
 
   return (
     <div className="min-h-screen bg-dark">
@@ -241,10 +247,10 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
             evolove
           </Link>
           <Link
-            href="/partners"
+            href={`/partners/${partner.id}`}
             className="text-sm text-cream/60 transition-colors hover:text-cream"
           >
-            &larr; Back to Partners
+            &larr; Back to Partner
           </Link>
         </div>
       </header>
@@ -253,13 +259,12 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
         <div className="mx-auto max-w-2xl">
           {/* Page heading */}
           <div className="mb-12">
-            <p className="label-sm mb-4">New Listing</p>
+            <p className="label-sm mb-4">Edit Listing</p>
             <h1 className="font-serif text-display-sm text-cream">
-              Add a Regen Partner
+              Edit {partner.business_name}
             </h1>
             <p className="mt-4 text-sage leading-relaxed">
-              Add a regenerative business, community, or project to the
-              directory. All team members can contribute listings.
+              Update the details for this regenerative partner listing.
             </p>
           </div>
 
@@ -537,10 +542,10 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
                 disabled={saving || uploading}
                 className="rounded-lg bg-gold px-8 py-3 font-medium text-dark transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {saving ? 'Saving...' : 'Add Partner'}
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
               <Link
-                href="/partners"
+                href={`/partners/${partner.id}`}
                 className="text-sm text-cream/40 transition-colors hover:text-cream/60"
               >
                 Cancel
