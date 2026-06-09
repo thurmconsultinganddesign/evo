@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { redirect, notFound } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { cn } from '@/lib/utils';
+import { Markdown } from '@/components/ui/Markdown';
 import type { Profile } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ export default async function PublicProfilePage({
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, teams(name)')
     .eq('id', id)
     .single();
 
@@ -32,7 +33,8 @@ export default async function PublicProfilePage({
     notFound();
   }
 
-  const typedProfile = profile as Profile;
+  const typedProfile = profile as Profile & { teams: { name: string } | null };
+  const teamName = typedProfile.teams?.name ?? null;
   const isOwner = user.id === typedProfile.id;
 
   // If profile is not visible and viewer is not the owner, show private message
@@ -175,6 +177,11 @@ export default async function PublicProfilePage({
             <h1 className="font-serif text-display-sm text-cream mb-2">
               {typedProfile.full_name}
             </h1>
+            {teamName && (
+              <span className="inline-block text-xs rounded-sm border border-gold/20 bg-gold/5 px-3 py-1 text-gold">
+                {teamName}
+              </span>
+            )}
             {isOwner && (
               <Link
                 href="/profile"
@@ -189,9 +196,9 @@ export default async function PublicProfilePage({
           {typedProfile.bio && (
             <section className="mb-12">
               <p className="label-sm mb-4">About</p>
-              <p className="text-cream/70 leading-relaxed">
+              <Markdown className="text-cream/70">
                 {typedProfile.bio}
-              </p>
+              </Markdown>
             </section>
           )}
 
@@ -199,9 +206,9 @@ export default async function PublicProfilePage({
           {typedProfile.purpose_statement && (
             <section className="mb-12 border border-white/5 rounded-sm p-8">
               <p className="label-sm mb-4">Purpose</p>
-              <p className="text-cream/80 leading-relaxed font-serif text-lg">
+              <Markdown className="text-cream/80 font-serif text-lg">
                 {typedProfile.purpose_statement}
-              </p>
+              </Markdown>
             </section>
           )}
 
@@ -335,7 +342,7 @@ function FundamentalCard({
         {score ?? '--'}
       </div>
       {reflection ? (
-        <p className="text-cream/50 text-sm leading-relaxed">{reflection}</p>
+        <Markdown className="text-cream/50 text-sm">{reflection}</Markdown>
       ) : (
         <p className="text-cream/20 text-sm italic">No reflection yet.</p>
       )}

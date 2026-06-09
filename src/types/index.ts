@@ -12,9 +12,17 @@ export interface Profile {
   relationships_reflection: string | null;
   career_score: number | null;
   career_reflection: string | null;
+  team_id: string | null;
   is_visible: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
 }
 
 export interface SocialLinks {

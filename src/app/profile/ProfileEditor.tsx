@@ -6,17 +6,20 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-import type { Profile } from '@/types';
+import { MarkdownTextarea } from '@/components/ui/MarkdownTextarea';
+import type { Profile, Team } from '@/types';
 
 interface ProfileEditorProps {
   userId: string;
   profile: Profile | null;
+  teams: Team[];
   isOnboarding: boolean;
 }
 
 export function ProfileEditor({
   userId,
   profile,
+  teams,
   isOnboarding,
 }: ProfileEditorProps) {
   const router = useRouter();
@@ -56,6 +59,7 @@ export function ProfileEditor({
   const [careerReflection, setCareerReflection] = useState(
     profile?.career_reflection ?? '',
   );
+  const [teamId, setTeamId] = useState(profile?.team_id ?? '');
   const [isVisible, setIsVisible] = useState(profile?.is_visible ?? false);
 
   // UI state
@@ -155,6 +159,7 @@ export function ProfileEditor({
         relationships_reflection: relationshipsReflection.trim() || null,
         career_score: careerScore,
         career_reflection: careerReflection.trim() || null,
+        team_id: teamId || null,
         is_visible: isVisible,
         updated_at: new Date().toISOString(),
       };
@@ -333,18 +338,37 @@ export function ProfileEditor({
                   />
                 </div>
 
+                {/* Team */}
+                <div>
+                  <label htmlFor="team" className="label-sm mb-2 block">
+                    Team
+                  </label>
+                  <select
+                    id="team"
+                    value={teamId}
+                    onChange={(e) => setTeamId(e.target.value)}
+                    className="w-full rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+                  >
+                    <option value="">No team</option>
+                    {teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Bio */}
                 <div>
                   <label htmlFor="bio" className="label-sm mb-2 block">
                     Bio
                   </label>
-                  <textarea
+                  <MarkdownTextarea
                     id="bio"
                     rows={4}
                     value={bio}
-                    onChange={(e) => setBio(e.target.value)}
+                    onChange={setBio}
                     placeholder="A few words about yourself..."
-                    className="w-full resize-none rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream placeholder:text-dark-300 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
                   />
                 </div>
 
@@ -437,13 +461,12 @@ export function ProfileEditor({
                 >
                   Purpose Statement
                 </label>
-                <textarea
+                <MarkdownTextarea
                   id="purposeStatement"
                   rows={5}
                   value={purposeStatement}
-                  onChange={(e) => setPurposeStatement(e.target.value)}
+                  onChange={setPurposeStatement}
                   placeholder="What drives you? What are you building toward?"
-                  className="w-full resize-none rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream placeholder:text-dark-300 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
                 />
               </div>
             </section>
@@ -676,13 +699,12 @@ function FundamentalSlider({
         >
           Reflection
         </label>
-        <textarea
+        <MarkdownTextarea
           id={`${id}-reflection`}
           rows={3}
           value={reflection}
-          onChange={(e) => onReflectionChange(e.target.value)}
+          onChange={onReflectionChange}
           placeholder={`Where are you at with your ${label.toLowerCase()}? What would you like to shift?`}
-          className="w-full resize-none rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream placeholder:text-dark-300 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
         />
       </div>
     </div>

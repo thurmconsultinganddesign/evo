@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import type { Profile } from '@/types';
+import { TeamDirectory, type TeamMember } from './TeamDirectory';
+import type { Team } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,16 +16,20 @@ export default async function TeamPage() {
     redirect('/login');
   }
 
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url, bio, purpose_statement')
-    .eq('is_visible', true)
-    .order('full_name');
+  const [{ data: profiles }, { data: teams }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, bio, purpose_statement, team_id')
+      .eq('is_visible', true)
+      .order('full_name'),
+    supabase
+      .from('teams')
+      .select('id, name, sort_order, created_at')
+      .order('sort_order'),
+  ]);
 
-  const visibleProfiles = (profiles ?? []) as Pick<
-    Profile,
-    'id' | 'full_name' | 'avatar_url' | 'bio' | 'purpose_statement'
-  >[];
+  const visibleProfiles = (profiles ?? []) as TeamMember[];
+  const teamList = (teams ?? []) as Team[];
 
   return (
     <div className="min-h-screen bg-dark">
@@ -91,62 +95,7 @@ export default async function TeamPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {visibleProfiles.map((profile) => (
-                <Link
-                  key={profile.id}
-                  href={`/profile/${profile.id}`}
-                  className="group block border border-white/5 rounded-sm p-6 hover:border-gold/20 transition-colors duration-300"
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-dark-100">
-                      {profile.avatar_url ? (
-                        <Image
-                          src={profile.avatar_url}
-                          alt={profile.full_name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <svg
-                            className="h-6 w-6 text-cream/20"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={1.5}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <h2 className="text-cream font-medium truncate group-hover:text-gold transition-colors">
-                        {profile.full_name}
-                      </h2>
-                      {profile.bio && (
-                        <p className="text-cream/40 text-sm mt-1 line-clamp-2 leading-relaxed">
-                          {profile.bio}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {profile.purpose_statement && (
-                    <div className="border-t border-white/5 pt-4">
-                      <p className="label-sm mb-2">Purpose</p>
-                      <p className="text-cream/50 text-sm line-clamp-3 leading-relaxed">
-                        {profile.purpose_statement}
-                      </p>
-                    </div>
-                  )}
-                </Link>
-              ))}
-            </div>
+            <TeamDirectory profiles={visibleProfiles} teams={teamList} />
           )}
         </div>
       </main>
