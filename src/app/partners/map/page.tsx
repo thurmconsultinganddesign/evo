@@ -21,7 +21,7 @@ export default async function MapPage() {
       <header className="border-b border-white/5 px-6 py-4">
         <div className="mx-auto max-w-content flex items-center justify-between">
           <Link href="/" className="font-serif text-xl text-cream tracking-wide">
-            evolove
+            evo
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/partners" className="text-sm text-cream/60 hover:text-cream transition-colors">

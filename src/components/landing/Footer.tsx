@@ -8,7 +8,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="font-serif text-xl text-cream tracking-wide">
-              evolove
+              evo
             </Link>
             <p className="text-cream/30 text-sm mt-3 leading-relaxed">
               Evolving with love toward a regenerative world.
@@ -56,7 +56,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-cream/20 text-xs">
-            &copy; {new Date().getFullYear()} Evolove. Ubud, Bali.
+            &copy; {new Date().getFullYear()} Evo. Ubud, Bali.
           </p>
           <p className="text-cream/20 text-xs">
             Built with care for a regenerative future.

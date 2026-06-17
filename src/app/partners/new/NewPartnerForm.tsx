@@ -238,7 +238,7 @@ export function NewPartnerForm({ userId }: NewPartnerFormProps) {
             href="/"
             className="font-serif text-xl tracking-wide text-cream"
           >
-            evolove
+            evo
           </Link>
           <Link
             href="/partners"

@@ -8,22 +8,46 @@ export function EvolutionLove() {
 
         <div className="max-w-3xl mb-12">
           <p className="text-lg text-dark/80 leading-relaxed mb-6">
-            Evolove is the synthesis of conscious development and deep care. Rooted
-            in Tri Hita Karana (the Balinese philosophy of harmony with the self, others,
-            and the divine), we shift human systems from survival-based competition to
-            heart-based collaboration.
+            Evo is a vision and a proposed strategy for how we can evolve the world
+            (with love) to reflect our shared visions of the optimal life and the
+            optimal world. Rooted in Tri Hita Karana (the Balinese philosophy of
+            harmony with the self, others, and the divine), and born in Jakarta &amp;
+            Ubud, we are experimenting with an approach to local, city / town based
+            conscious evolution.
           </p>
 
           <blockquote className="border-l-2 border-gold pl-6 my-8 text-dark/60 italic">
-            &ldquo;The central contention of ecological civilization and social regeneration is work done in units of
-            radical trust. It is a relational economic choice.&rdquo;
+            &ldquo;You never change things by fighting the existing reality. To change
+            something, build a new model that makes the existing model obsolete.&rdquo;
+            <span className="block mt-3 not-italic text-sm text-dark/40">
+              &mdash; Buckminster Fuller
+            </span>
           </blockquote>
 
+          <p className="text-dark/70 leading-relaxed mb-6">
+            Our aim is to identify, support, connect and collaborate with
+            &lsquo;regenerators&rsquo; in and around Ubud and Jakarta to support each
+            other towards building a better future for this archipelago and world we
+            call Home. We have adopted the transition network model in Ubud, and are
+            exploring the same for Jakarta, collaborating with Impact Hub.
+          </p>
+
+          <p className="text-dark/70 leading-relaxed mb-6">
+            Our theory of change is simple: in order to enable the shift towards a more
+            regenerative and loving future, we identify, connect, support, and
+            collaborate with existing city / town based &lsquo;regen&rsquo; /
+            &lsquo;evo&rsquo; hubs (like Mana Earthly Paradise), any eco / evo villages
+            nearby (like Taman Petanu Eco Neighborhood), and a network of regenerative
+            solution providers as a city / town guide for aligned products, services,
+            restaurants, coworking spaces, resorts, classes, and events.
+          </p>
+
           <p className="text-dark/70 leading-relaxed">
-            By building models that render the status quo obsolete, the
-            platform provides every individual and community with the tools
-            needed to move from extraction toward regeneration,
-            developing each participant&apos;s fullest potential.
+            This website describes this theory of change and, for registered members,
+            offers a way to log in and fill in both a personal profile and a regen
+            offering (place / product / service / class / event). This initiative is
+            designed to be inclusive and decentralized. You are warmly invited.
+            Welcome Home.
           </p>
         </div>
 
@@ -41,7 +65,7 @@ export function EvolutionLove() {
           />
           <PillarCard
             number="03"
-            title="Evolove Platform"
+            title="Evo Platform"
             description="The digital coordination layer connecting villages, hubs, and people into a global network of regenerative collaboration. Starting here in Ubud."
           />
         </div>

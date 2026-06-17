@@ -5,21 +5,30 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark/95 to-dark" />
 
       <div className="relative section-container text-center">
+        {/* Logo symbol — drop the PNG into /public/images/logo/ (see README there).
+            Uses the white/night-mode version so it blends with the dark background. */}
+        <img
+          src="/images/logo/evo-symbol-white.png"
+          alt=""
+          className="mx-auto mb-4 h-20 md:h-24 w-auto"
+        />
+
+        <p className="font-serif text-3xl md:text-4xl text-cream tracking-wide mb-8">
+          evo
+        </p>
+
         <p className="label-sm mb-6">
-          The sacred context of the great awakening
+          From Ubud with Love
         </p>
 
         <h1 className="font-serif text-display-sm md:text-display text-cream max-w-4xl mx-auto mb-8">
-          From Fragmentation{' '}
-          <span className="block">to Coherence.</span>
+          A pilot project for conscious evolution
         </h1>
 
-        <p className="text-lg md:text-xl text-cream/60 max-w-2xl mx-auto mb-4 leading-relaxed">
-          Evolove is the synthesis of conscious development and deep care.
-        </p>
-        <p className="text-base md:text-lg text-cream/40 max-w-xl mx-auto">
-          Building the infrastructure for a regenerative civilization.
-          Starting here, in Ubud.
+        <p className="text-lg md:text-xl text-cream/60 max-w-2xl mx-auto leading-relaxed">
+          At Mana Earthly Paradise and Tony Raka&apos;s, a small group of
+          regenerators are banding together to build something special. For all
+          of us, starting with &lsquo;regenerators&rsquo; in and around Ubud.
         </p>
       </div>
 

@@ -40,7 +40,7 @@ export default async function TeamPage() {
             href="/"
             className="font-serif text-xl text-cream tracking-wide"
           >
-            evolove
+            evo
           </Link>
           <div className="flex items-center gap-6">
             <Link

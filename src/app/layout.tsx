@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Evolove — From Fragmentation to Coherence',
+  title: 'evo — A pilot project for conscious evolution',
   description:
     'A regenerative community platform for Ubud. Building the infrastructure for conscious evolution, one community at a time.',
 };

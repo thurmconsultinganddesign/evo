@@ -244,7 +244,7 @@ export function EditPartnerForm({ partner }: EditPartnerFormProps) {
             href="/"
             className="font-serif text-xl tracking-wide text-cream"
           >
-            evolove
+            evo
           </Link>
           <Link
             href={`/partners/${partner.id}`}

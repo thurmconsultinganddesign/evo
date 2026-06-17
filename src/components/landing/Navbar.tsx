@@ -48,7 +48,7 @@ export function Navbar() {
       <div className="mx-auto max-w-content px-6 flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
         <Link href="/" className="font-serif text-xl md:text-2xl text-cream tracking-wide">
-          evolove
+          evo
         </Link>
 
         {/* Desktop nav */}

@@ -204,7 +204,7 @@ export function ProfileEditor({
             href="/"
             className="font-serif text-xl tracking-wide text-cream"
           >
-            evolove
+            evo
           </Link>
           <Link
             href="/dashboard"

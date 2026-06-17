@@ -10,7 +10,7 @@ export function ThreeFundamentals() {
 
         <p className="text-cream/50 max-w-2xl mb-16 leading-relaxed">
           Before we try to change the world, we get our own house in order.
-          Evolove&apos;s signature belief: personal fundamentals must be solid before
+          Evo&apos;s signature belief: personal fundamentals must be solid before
           leading others. Every member focuses on three areas.
         </p>
 
