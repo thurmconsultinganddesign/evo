@@ -19,7 +19,9 @@ export default async function TeamPage() {
   const [{ data: profiles }, { data: teams }] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, bio, purpose_statement, team_id')
+      .select(
+        'id, full_name, avatar_url, bio, purpose_statement, profile_teams(team_id)',
+      )
       .eq('is_visible', true)
       .order('full_name'),
     supabase
@@ -28,7 +30,20 @@ export default async function TeamPage() {
       .order('sort_order'),
   ]);
 
-  const visibleProfiles = (profiles ?? []) as TeamMember[];
+  const visibleProfiles: TeamMember[] = (
+    (profiles ?? []) as Array<
+      Omit<TeamMember, 'team_ids'> & {
+        profile_teams: { team_id: string }[] | null;
+      }
+    >
+  ).map((p) => ({
+    id: p.id,
+    full_name: p.full_name,
+    avatar_url: p.avatar_url,
+    bio: p.bio,
+    purpose_statement: p.purpose_statement,
+    team_ids: (p.profile_teams ?? []).map((pt) => pt.team_id),
+  }));
   const teamList = (teams ?? []) as Team[];
 
   return (

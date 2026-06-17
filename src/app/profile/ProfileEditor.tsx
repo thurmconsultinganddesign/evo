@@ -13,6 +13,7 @@ interface ProfileEditorProps {
   userId: string;
   profile: Profile | null;
   teams: Team[];
+  selectedTeamIds: string[];
   isOnboarding: boolean;
 }
 
@@ -20,6 +21,7 @@ export function ProfileEditor({
   userId,
   profile,
   teams,
+  selectedTeamIds,
   isOnboarding,
 }: ProfileEditorProps) {
   const router = useRouter();
@@ -31,6 +33,7 @@ export function ProfileEditor({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bio, setBio] = useState(profile?.bio ?? '');
   const [linkedinUrl, setLinkedinUrl] = useState(profile?.linkedin_url ?? '');
+  const [whatsapp, setWhatsapp] = useState(profile?.whatsapp ?? '');
   const [instagram, setInstagram] = useState(
     profile?.social_links?.instagram ?? '',
   );
@@ -59,8 +62,14 @@ export function ProfileEditor({
   const [careerReflection, setCareerReflection] = useState(
     profile?.career_reflection ?? '',
   );
-  const [teamId, setTeamId] = useState(profile?.team_id ?? '');
+  const [teamIds, setTeamIds] = useState<string[]>(selectedTeamIds);
   const [isVisible, setIsVisible] = useState(profile?.is_visible ?? false);
+
+  const toggleTeam = useCallback((id: string) => {
+    setTeamIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
+    );
+  }, []);
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -147,6 +156,7 @@ export function ProfileEditor({
         avatar_url: avatarUrl || null,
         bio: bio.trim() || null,
         linkedin_url: linkedinUrl.trim() || null,
+        whatsapp: whatsapp.trim() || null,
         social_links: {
           instagram: instagram.trim() || undefined,
           twitter: twitter.trim() || undefined,
@@ -159,7 +169,6 @@ export function ProfileEditor({
         relationships_reflection: relationshipsReflection.trim() || null,
         career_score: careerScore,
         career_reflection: careerReflection.trim() || null,
-        team_id: teamId || null,
         is_visible: isVisible,
         updated_at: new Date().toISOString(),
       };
@@ -169,6 +178,23 @@ export function ProfileEditor({
         .upsert(profileData, { onConflict: 'id' });
 
       if (error) throw error;
+
+      // Sync team memberships (many-to-many via profile_teams):
+      // clear the member's existing links, then insert the current selection.
+      const { error: clearTeamsError } = await supabase
+        .from('profile_teams')
+        .delete()
+        .eq('profile_id', userId);
+
+      if (clearTeamsError) throw clearTeamsError;
+
+      if (teamIds.length > 0) {
+        const { error: insertTeamsError } = await supabase
+          .from('profile_teams')
+          .insert(teamIds.map((team_id) => ({ profile_id: userId, team_id })));
+
+        if (insertTeamsError) throw insertTeamsError;
+      }
 
       setFeedback({
         type: 'success',
@@ -338,24 +364,60 @@ export function ProfileEditor({
                   />
                 </div>
 
-                {/* Team */}
+                {/* Teams (multi-select) */}
                 <div>
-                  <label htmlFor="team" className="label-sm mb-2 block">
-                    Team
-                  </label>
-                  <select
-                    id="team"
-                    value={teamId}
-                    onChange={(e) => setTeamId(e.target.value)}
-                    className="w-full rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
-                  >
-                    <option value="">No team</option>
-                    {teams.map((team) => (
-                      <option key={team.id} value={team.id}>
-                        {team.name}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="label-sm mb-2 block">Teams</label>
+                  <p className="mb-3 text-xs text-cream/30">
+                    Select any teams you belong to — you can choose more than one.
+                  </p>
+                  <div className="space-y-2">
+                    {teams.map((team) => {
+                      const checked = teamIds.includes(team.id);
+                      return (
+                        <label
+                          key={team.id}
+                          className={cn(
+                            'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-colors',
+                            checked
+                              ? 'border-gold/40 bg-gold/5'
+                              : 'border-dark-300 bg-dark-100 hover:border-white/20',
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleTeam(team.id)}
+                            className="peer sr-only"
+                          />
+                          <span
+                            className={cn(
+                              'flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
+                              checked
+                                ? 'border-gold bg-gold text-dark'
+                                : 'border-dark-300 bg-dark',
+                            )}
+                          >
+                            {checked && (
+                              <svg
+                                className="h-3.5 w-3.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                          <span className="text-sm text-cream">{team.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Bio */}
@@ -385,6 +447,25 @@ export function ProfileEditor({
                     placeholder="https://linkedin.com/in/yourname"
                     className="w-full rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream placeholder:text-dark-300 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
                   />
+                </div>
+
+                {/* WhatsApp */}
+                <div>
+                  <label htmlFor="whatsapp" className="label-sm mb-2 block">
+                    WhatsApp
+                  </label>
+                  <input
+                    id="whatsapp"
+                    type="tel"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="+62 812 3456 7890"
+                    className="w-full rounded-lg border border-dark-300 bg-dark-100 px-4 py-3 text-cream placeholder:text-dark-300 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+                  />
+                  <p className="mt-1.5 text-xs text-cream/30">
+                    Optional. Include your country code. Shown to other members so
+                    they can message you — leave blank to keep it private.
+                  </p>
                 </div>
 
                 {/* Social Links */}

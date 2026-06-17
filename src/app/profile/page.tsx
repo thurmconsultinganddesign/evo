@@ -30,6 +30,13 @@ export default async function ProfilePage({
     .select('id, name, sort_order, created_at')
     .order('sort_order');
 
+  const { data: profileTeams } = await supabase
+    .from('profile_teams')
+    .select('team_id')
+    .eq('profile_id', user.id);
+
+  const selectedTeamIds = (profileTeams ?? []).map((row) => row.team_id);
+
   const params = await searchParams;
   const isOnboarding = params.onboarding === 'true';
 
@@ -38,6 +45,7 @@ export default async function ProfilePage({
       userId={user.id}
       profile={profile}
       teams={(teams ?? []) as Team[]}
+      selectedTeamIds={selectedTeamIds}
       isOnboarding={isOnboarding}
     />
   );

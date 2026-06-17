@@ -4,6 +4,7 @@ export interface Profile {
   avatar_url: string | null;
   bio: string | null;
   linkedin_url: string | null;
+  whatsapp: string | null;
   social_links: SocialLinks | null;
   purpose_statement: string | null;
   health_score: number | null;

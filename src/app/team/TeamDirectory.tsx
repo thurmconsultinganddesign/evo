@@ -8,8 +8,10 @@ import type { Profile, Team } from '@/types';
 
 export type TeamMember = Pick<
   Profile,
-  'id' | 'full_name' | 'avatar_url' | 'bio' | 'purpose_statement' | 'team_id'
->;
+  'id' | 'full_name' | 'avatar_url' | 'bio' | 'purpose_statement'
+> & {
+  team_ids: string[];
+};
 
 interface TeamDirectoryProps {
   profiles: TeamMember[];
@@ -21,15 +23,17 @@ export function TeamDirectory({ profiles, teams }: TeamDirectoryProps) {
 
   // Only show filter pills for teams that actually have visible members.
   const teamsWithMembers = teams.filter((team) =>
-    profiles.some((p) => p.team_id === team.id),
+    profiles.some((p) => p.team_ids.includes(team.id)),
   );
 
   const filtered = activeTeam
-    ? profiles.filter((p) => p.team_id === activeTeam)
+    ? profiles.filter((p) => p.team_ids.includes(activeTeam))
     : profiles;
 
-  const teamName = (id: string | null) =>
-    teams.find((t) => t.id === id)?.name ?? null;
+  const teamNamesFor = (ids: string[]) =>
+    ids
+      .map((id) => teams.find((t) => t.id === id)?.name)
+      .filter((name): name is string => Boolean(name));
 
   return (
     <>
@@ -114,9 +118,9 @@ export function TeamDirectory({ profiles, teams }: TeamDirectoryProps) {
                   <h2 className="text-cream font-medium truncate group-hover:text-gold transition-colors">
                     {profile.full_name}
                   </h2>
-                  {teamName(profile.team_id) && (
+                  {teamNamesFor(profile.team_ids).length > 0 && (
                     <p className="text-gold/70 text-xs mt-0.5 truncate">
-                      {teamName(profile.team_id)}
+                      {teamNamesFor(profile.team_ids).join(' · ')}
                     </p>
                   )}
                   {profile.bio && (
